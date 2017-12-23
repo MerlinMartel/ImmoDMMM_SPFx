@@ -1,0 +1,11 @@
+{
+  "$schema": "https://dev.office.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "immo-dmmm-sp-fx-client-side-solution",
+    "id": "c5dbcca8-e5ad-41bd-9b15-7ce490bcd64d",
+    "version": "1.0.0.0"
+  },
+  "paths": {
+    "zippedPackage": "solution/immo-dmmm-sp-fx.sppkg"
+  }
+}

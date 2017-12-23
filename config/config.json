@@ -1,0 +1,18 @@
+{
+  "$schema": "https://dev.office.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "immodmmm-admin-app-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/immodmmmAdminApp/ImmodmmmAdminAppWebPart.js",
+          "manifest": "./src/webparts/immodmmmAdminApp/ImmodmmmAdminAppWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "ImmodmmmAdminAppWebPartStrings": "lib/webparts/immodmmmAdminApp/loc/{locale}.js"
+  }
+}

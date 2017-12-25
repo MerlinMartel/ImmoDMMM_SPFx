@@ -1,3 +1,5 @@
+import {IExpensesService} from "../../../models/IExpensesService";
+
 export interface IImmodmmmAdminAppProps {
-  description: string;
+  expensesService:IExpensesService;
 }

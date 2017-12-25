@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
+import {EnvironmentType, Environment, Version} from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
   IPropertyPaneConfiguration,
@@ -10,6 +10,9 @@ import {
 import * as strings from 'ImmodmmmAdminAppWebPartStrings';
 import ImmodmmmAdminApp from './components/ImmodmmmAdminApp';
 import { IImmodmmmAdminAppProps } from './components/IImmodmmmAdminAppProps';
+import {IExpensesService} from "../../models/IExpensesService";
+import {ExpensesService} from "../../services/ExpensesService";
+import * as moment from 'moment';
 
 export interface IImmodmmmAdminAppWebPartProps {
   description: string;
@@ -17,11 +20,35 @@ export interface IImmodmmmAdminAppWebPartProps {
 
 export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmodmmmAdminAppWebPartProps> {
 
+  private expensesService: IExpensesService;
+
+  public async onInit() {
+
+    switch (Environment.type) {
+      case EnvironmentType.ClassicSharePoint:
+      case EnvironmentType.SharePoint:
+        this.expensesService = new ExpensesService(this.context);
+        moment.locale(this.context.pageContext.cultureInfo.currentUICultureName);
+        break;
+
+      case EnvironmentType.Local:
+      case EnvironmentType.Test:
+      default:
+        //his.newsService = new NewsServiceMock();
+        // Register icons and pull the fonts from the default SharePoint cdn:
+        //initializeIcons();
+        break;
+    }
+
+    await super.onInit();
+  }
+
+
   public render(): void {
     const element: React.ReactElement<IImmodmmmAdminAppProps > = React.createElement(
       ImmodmmmAdminApp,
       {
-        description: this.properties.description
+        expensesService: this.expensesService,
       }
     );
 

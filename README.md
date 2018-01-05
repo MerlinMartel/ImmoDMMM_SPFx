@@ -19,8 +19,4 @@ This package produces the following:
 
 ### Build options
 
-gulp clean - TODO
-gulp test - TODO
-gulp serve - TODO
-gulp bundle - TODO
-gulp package-solution - TODO
+npm run dev (GULP serve fonctionne pas avec la nouvelle version de node)

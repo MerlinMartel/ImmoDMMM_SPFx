@@ -2,6 +2,10 @@ import {IExpensesService} from "../models/IExpensesService";
 import {IExpense} from "../models/IExpense";
 import * as _ from 'lodash';
 import * as moment from "moment";
+import {Reimbursement} from "../models/IReimbursement";
+import {Transaction} from "../models/ITransaction";
+import {TaxesCategory} from "../models/ITaxesCategory";
+import {Revenu} from "../models/IRevenu";
 
 const mockdata = [{
   "type": "Document",
@@ -90,10 +94,10 @@ const mockdata = [{
 const mockdata2 = [{
   "title": "titre",
 }];
-let year = 0;
 
 export class ExpensesServiceMock implements IExpensesService {
   public async getExpenses(year?: number): Promise<any> {
+
     console.log('..ExpensesServiceMock - getExpense - begin');
     await this.timeout(1000);
 
@@ -112,4 +116,22 @@ export class ExpensesServiceMock implements IExpensesService {
     });
   }
 
+  public getTaxCategories():TaxesCategory[] {
+    var toto = [];
+    return toto;
+  };
+  public async getRevenues(year?: number): Promise<Revenu[]>{
+    year = 0;
+    var toto = [];
+    return toto;
+  }
+  public async getTransactionCompte(year?: number): Promise<Transaction[]>{
+    year = 0;
+    var toto = [];
+    return toto;
+  }
+  public async getReimbursement(): Promise<Reimbursement[]>{
+    var toto = [];
+    return toto;
+  }
 }

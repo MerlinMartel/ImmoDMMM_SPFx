@@ -14,6 +14,7 @@ import {IExpensesService} from "../../models/IExpensesService";
 import {ExpensesService} from "../../services/ExpensesService";
 import * as moment from 'moment';
 import {ExpensesServiceMock} from "../../services/ExpensesServiceMock";
+import { SPComponentLoader } from '@microsoft/sp-loader';
 
 export interface IImmodmmmAdminAppWebPartProps {
   description: string;
@@ -41,6 +42,8 @@ export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmo
         break;
     }
 
+    SPComponentLoader.loadCss('https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.3.0/css/fabric.min.css');
+
     await super.onInit();
     console.log('ImmodmmmAdminAppWebPart - onInit - end');
   }
@@ -60,7 +63,7 @@ export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmo
   }
 
   protected get dataVersion(): Version {
-    return Version.parse('1.0');
+    return Version.parse('1.1');
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {

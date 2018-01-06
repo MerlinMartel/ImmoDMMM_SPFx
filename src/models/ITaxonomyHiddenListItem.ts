@@ -1,7 +1,7 @@
-export interface TaxonomyHiddenListItem {
-  id:number;
-  path1033 : string;
-  path1036 : string;
-  term1033 : string;
-  term1036 : string;
+export class TaxonomyHiddenListItem {
+  public id:number;
+  public path1033 : string;
+  public path1036 : string;
+  public term1033 : string;
+  public term1036 : string;
 }

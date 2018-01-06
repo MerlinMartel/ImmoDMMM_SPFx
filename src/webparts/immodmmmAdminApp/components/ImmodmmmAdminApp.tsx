@@ -38,7 +38,7 @@ export default class ImmodmmmAdminApp extends React.Component<IImmodmmmAdminAppP
     console.log('.ImmodmmmAdminApp - render');
     return (
       <div>
-        <AppContainer expenses={this.state.expenses} isLoading={this.state.isLoading}/>
+        <AppContainer expenses={this.state.expenses} isLoading={this.state.isLoading} expensesService={this.props.expensesService}/>
       </div>
     );
   }

@@ -5,10 +5,13 @@ import {IExpense} from "../../../models/IExpense";
 import * as _ from 'lodash';
 import ExpensesGrid from "./expensesGrid";
 import {PivotItem} from "office-ui-fabric-react/lib/components/Pivot/PivotItem";
+import Taxes from "./taxes";
+import {IExpensesService} from "../../../models/IExpensesService";
 
 export interface IAppContainerProps {
   expenses:IExpense[];
   isLoading:boolean;
+  expensesService:IExpensesService;
 }
 
 export interface IAppContainerState {
@@ -29,7 +32,7 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
     let currentYearString = currentYear.toString();
 
     this.state = {
-      selectedYear: {key: currentYear, text: currentYearString},
+      selectedYear: {key: 2016, text: '2016'},
       expensesFiltered: []
     };
   }
@@ -81,9 +84,9 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
             <br/>
             <ExpensesGrid expensesFiltered={ expensesFiltered } isLoading={this.props.isLoading}/>
           </PivotItem>
-          <PivotItem linkText='Import'>
+          <PivotItem linkText='Impot'>
             <br/>
-            <Label>Impot</Label>
+            <Taxes expensesFiltered={expensesFiltered} isLoading={this.props.isLoading} expensesService={this.props.expensesService} year={this.state.selectedYear.key}/>
           </PivotItem>
           <PivotItem linkText='Remboursement'>
             <br/>

@@ -102,7 +102,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
     let renderSpinner: JSX.Element = null;
 
     if(this.props.isLoading == false && this.props.expensesFiltered.length === 0){
-      renderGrid = <div>No Items to show</div>
+      renderGrid = <div>No Items to show</div>;
     }
     if(this.props.isLoading == false && this.props.expensesFiltered.length > 0){
       renderGrid = <DetailsList
@@ -114,9 +114,9 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
       />;
     }
     if(this.props.isLoading){
-      renderSpinner = <Spinner size={ SpinnerSize.large } />
+      renderSpinner = <Spinner size={ SpinnerSize.large } />;
     }else{
-      renderSpinner = <div></div>
+      renderSpinner = <div></div>;
     }
 
     return (

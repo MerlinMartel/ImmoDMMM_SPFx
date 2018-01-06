@@ -4,7 +4,7 @@ import {IProvider} from "../models/IProvider";
 import {TaxonomyHiddenListItem} from "../models/ITaxonomyHiddenListItem";
 import IWebPartContext from "@microsoft/sp-webpart-base/lib/core/IWebPartContext";
 import * as _ from 'lodash';
-import {async} from "q";
+import * as moment from 'moment';
 
 export class ExpensesService {
   //implements IExpensesService
@@ -55,7 +55,7 @@ export class ExpensesService {
         this.createObjectForDepensesItem(res);
       });
     }
-    pnp.sp.site.rootWeb.lists.getByTitle('Fournisseurs').items.top(5000).inBatch(batch).get().then(async(res: any) => {
+    pnp.sp.site.rootWeb.lists.getByTitle('Fournisseurs').items.top(5000).inBatch(batch).usingCaching().get().then(async(res: any) => {
       res.forEach(item => {
         let x:any = {};
         x.id = item.Id;
@@ -63,7 +63,7 @@ export class ExpensesService {
         this.providers.push(x);
       });
     });
-    pnp.sp.site.rootWeb.lists.getByTitle('TaxonomyHiddenList').items.top(5000).inBatch(batch).get().then(async(res: any) => {
+    pnp.sp.site.rootWeb.lists.getByTitle('TaxonomyHiddenList').items.top(5000).inBatch(batch).usingCaching().get().then(async(res: any) => {
       res.forEach(item => {
         let x:any = {};
         x.id = item.Id;
@@ -101,8 +101,6 @@ export class ExpensesService {
         expenseItem.provider = providerItemFiltered[0].title;
       }
     });
-
-    console.log(this.expenses);
     return this.expenses;
   }
 
@@ -117,7 +115,9 @@ export class ExpensesService {
       x.created = item.Created;
       x.modified = item.Modified;
       if (item.Date1 != null) {
-        x.date = new Date(item.Date1); //.format('yyyy-MM-dd');
+        x.date = item.Date1;
+        x.dateFormatted = moment(item.Date1).format('YYYY-MM-DD');
+        x.dateValue = new Date(item.Date1);
       }
       x.authorId = item.AuthorId;
       x.providerId = parseInt(item.FournisseursId);
@@ -125,8 +125,8 @@ export class ExpensesService {
       x.manager = item.GestionnairesChoice;
       x.p = item.P;
       x.relativeEditLink = this.webUrl + '/Depenses/Forms/EditForm.aspx?ID=' + item.Id + '&Source=' + window.location.href;
-      if (x.date != undefined) {
-        x.year = 0; //parseInt(x.date.substr(0, 4));  TODO corriger year
+      if (x.dateValue != undefined) {
+        x.year = new Date(item.Date1).getFullYear();
       }
       if (item.Logements) {
         x.flatId = parseInt(item.Logements.Label);
@@ -147,7 +147,11 @@ export class ExpensesService {
       x.id = item.Id;
       x.created = item.Created;
       x.modified = item.Modified;
-      x.date = item.Date;
+      if (item.Date != null) {
+        x.date = item.Date;
+        x.dateFormatted = moment(item.Date).format('YYYY-MM-DD');
+        x.dateValue = new Date(item.Date1);
+      }
       x.authorId = parseInt(item.AuthorId);
       x.providerId = item.FournisseursId;
       x.title = item.Title;
@@ -155,7 +159,7 @@ export class ExpensesService {
       x.p = item.P;
       x.relativeEditLink = this.webUrl + '/Lists/depenses/EditForm.aspx?ID=' + item.Id + '&Source=' + window.location.href;
       if (x.date != undefined) {
-        x.year = 0; // parseInt(x.date.substr(0, 4)); TODO corriger year
+        x.year = new Date(item.Date).getFullYear()
       }
       if (item.Logements) {
         x.flatId = parseInt(item.Logements.Label);

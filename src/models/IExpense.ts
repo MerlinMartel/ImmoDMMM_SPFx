@@ -1,7 +1,7 @@
 export interface IExpense {
   id: number;
   title?: string;
-  filename?: string;
+  FileLeafRef?: string;
   price?: number;
   validated?: boolean;
   manager?: string; // TODO trouver un meilleur nom

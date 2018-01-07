@@ -154,6 +154,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
                 name="name"
                 onChange={this.handleInputChange}
                 value={this.state.name}
+                defaultValue={this.props.expense.FileLeafRef}
               />
               <TextField
                 label='Titre'
@@ -161,6 +162,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
                 name="title"
                 onChange={this.handleInputChange}
                 value={this.state.title}
+                defaultValue={this.props.expense.title}
               />
               <br/>
               <TaxonomyPicker
@@ -169,6 +171,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
                 termSetGuid="d6bcd487-69d8-4ec7-9c00-3d1b1219cae8"
                 termSetName="1821 Bennett - Logements"
                 termSetCountMaxSwapToAsync={100}
+                defaultValue={this.props.expense.flat}
                 multi={false}
               />
               <TaxonomyPicker
@@ -195,8 +198,8 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
             </div>
             <div className="ms-Grid-col ms-sm6">
               <Iframe url={this.state.expenseState.ServerRedirectedEmbedUri}
-                      width="450px"
-                      height="450px"
+                      width="100%"
+                      height="700px"
                       id="myId"
                       className="myClassname"
                       display="initial"

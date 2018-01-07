@@ -25,7 +25,7 @@ export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmo
   private expensesService: IExpensesService;
 
   public async onInit() {
-    console.log('ImmodmmmAdminAppWebPart - onInit - begin');
+    //console.log('ImmodmmmAdminAppWebPart - onInit - begin');
     switch (Environment.type) {
       case EnvironmentType.ClassicSharePoint:
       case EnvironmentType.SharePoint:
@@ -45,12 +45,12 @@ export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmo
     SPComponentLoader.loadCss('https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.3.0/css/fabric.min.css');
 
     await super.onInit();
-    console.log('ImmodmmmAdminAppWebPart - onInit - end');
+    //console.log('ImmodmmmAdminAppWebPart - onInit - end');
   }
 
 
   public render(): void {
-    console.log('ImmodmmmAdminAppWebPart - render - begin');
+    //console.log('ImmodmmmAdminAppWebPart - render - begin');
     const element: React.ReactElement<IImmodmmmAdminAppProps > = React.createElement(
       ImmodmmmAdminApp,
       {
@@ -59,7 +59,7 @@ export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmo
     );
 
     ReactDom.render(element, this.domElement);
-    console.log('ImmodmmmAdminAppWebPart - render - end');
+    //console.log('ImmodmmmAdminAppWebPart - render - end');
   }
 
   protected get dataVersion(): Version {

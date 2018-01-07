@@ -7,16 +7,19 @@ import ExpensesGrid from "./expensesGrid";
 import {PivotItem} from "office-ui-fabric-react/lib/components/Pivot/PivotItem";
 import Taxes from "./taxes";
 import {IExpensesService} from "../../../models/IExpensesService";
+import {IImmodmmmAdminAppProps} from "./IImmodmmmAdminAppProps";
+import * as strings from "ImmodmmmAdminAppWebPartStrings";
 
 export interface IAppContainerProps {
-  expenses:IExpense[];
-  isLoading:boolean;
   expensesService:IExpensesService;
 }
 
 export interface IAppContainerState {
   expensesFiltered?:IExpense[];
   selectedYear?: IDropdownOptionCustom;
+  isLoading?: boolean;
+  error?: string;
+  expenses?: any;
 }
 export interface IDropdownOptionCustom{
   key:number;
@@ -26,7 +29,7 @@ export interface IDropdownOptionCustom{
 export default class AppContainer extends React.Component<IAppContainerProps, IAppContainerState> {
 
   constructor(props: IAppContainerProps) {
-    console.log('.appContainer - Constructor - start');
+    //console.log('.appContainer - Constructor - start');
     super(props);
     let currentYear = new Date().getFullYear();
     let currentYearString = currentYear.toString();
@@ -36,17 +39,46 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
       expensesFiltered: []
     };
   }
+  private async getData(props: IImmodmmmAdminAppProps, first: boolean) {
+    //console.log('.ImmodmmmAdminApp - getData - begin');
+    this.setState({
+      isLoading: true
+    });
+    try {
+      let r = await props.expensesService.getExpenses(this.state.selectedYear.key);
+      let rSorted = _.orderBy(r, ['dateValue'],['desc']);
+      this.setState({
+        expensesFiltered: rSorted,
+        isLoading: false,
+        error: null
+      });
+    } catch (reason) {
+      let { message } = reason;
+      this.setState({
+        error: message || strings.UnexpectedErrorMessage,
+        expensesFiltered: [],
+        isLoading: false
+      });
+      throw reason;
+    }
+    //console.log(this.state.expensesFiltered);
+    //console.log('.ImmodmmmAdminApp - getData - end');
+  }
 
+  public componentDidMount() {
+    //console.log('.ImmodmmmAdminApp - componentDidMount');
+    this.getData(this.props, true);
+  }
 
   public render(): React.ReactElement<IAppContainerProps> {
-    console.log('.appContainer - render');
-    console.log('this.props.expenses');
-    console.log(this.props.expenses);
-    console.log('this.state.expensesFiltered');
-    console.log(this.state.expensesFiltered);
-    let expensesFiltered =  _.filter(this.props.expenses, (e:IExpense) => {
-      return e.year == this.state.selectedYear.key;
-    });
+    //console.log('.appContainer - render');
+    //console.log('this.props.expenses');
+    //console.log(this.state.expenses);
+    //console.log('this.state.expensesFiltered');
+    //console.log(this.state.expensesFiltered);
+    //let expensesFiltered =  _.filter(this.state.expenses, (e:IExpense) => {
+    //  return e.year == this.state.selectedYear.key;
+    //});
 
 
 
@@ -71,6 +103,7 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
                 { key: 2014, text: '2014' },
                 { key: 2015, text: '2015' },
                 { key: 2016, text: '2016' },
+                { key: 2017, text: '2017' },
                 { key: 2018, text: '2018' },
               ]
             }
@@ -82,11 +115,11 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
         <Pivot linkFormat={ PivotLinkFormat.tabs }>
           <PivotItem linkText='Dépenses'>
             <br/>
-            <ExpensesGrid expensesFiltered={ expensesFiltered } isLoading={this.props.isLoading}/>
+            <ExpensesGrid expensesFiltered={ this.state.expensesFiltered } isLoading={this.state.isLoading} expensesService = {this.props.expensesService}/>
           </PivotItem>
           <PivotItem linkText='Impot'>
             <br/>
-            <Taxes expensesFiltered={expensesFiltered} isLoading={this.props.isLoading} expensesService={this.props.expensesService} year={this.state.selectedYear.key}/>
+            <Taxes expensesFiltered={this.state.expensesFiltered} isLoading={this.state.isLoading} expensesService={this.props.expensesService} year={this.state.selectedYear.key}/>
           </PivotItem>
           <PivotItem linkText='Remboursement'>
             <br/>
@@ -102,34 +135,17 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
   }
 
   @autobind
-  public changeYearState(item:IDropdownOptionCustom) {
+  public async changeYearState(item:IDropdownOptionCustom) {
+    this.setState({
+      isLoading: true
+    });
 
     console.log('here is the things updating...' + item.key + ' ' + item.text);
-
-    this.filterExpensesByYear(this.props.expenses,item.key);
+    let r = await this.props.expensesService.getExpenses(item.key);
     this.setState({
       selectedYear: item,
+      expensesFiltered: r,
+      isLoading: false
     });
-  }
-
-  private filterExpensesByYear(expenses:IExpense[], year:number){
-    let yearNumber = Number(year);
-    let expensesFiltered =  _.filter(expenses, (e:IExpense) => {
-      return e.year == yearNumber;
-    });
-    this.setState({
-      expensesFiltered : expensesFiltered
-    });
-  }
-  public componentWillReceiveProps(){
-    console.log('.appContainer - componentWillReceiveProps');
-
-  }
-  public componentDidReceiveProps(){
-    console.log('.appContainer - componentDidReceiveProps');
-
-  }
-  public componentDidUpdate(){
-    console.log('.appContainer - componentDidUpdate');
   }
 }

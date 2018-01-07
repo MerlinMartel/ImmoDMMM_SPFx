@@ -34,7 +34,7 @@ export class ExpensesService {
 
 
   public async getExpenses(year?: number): Promise<IExpense[]> {
-    console.log('ExpensesService - getExpenses');
+    //console.log('ExpensesService - getExpenses');
     this.expenses = []; // Reset Array, because of the push...it was accumulating
     this.providers = [];
     this.taxonomyHiddenListItems = [];
@@ -108,11 +108,21 @@ export class ExpensesService {
         expenseItem.provider = providerItemFiltered[0].title;
       }
     });
+
     return this.expenses;
+  }
+  public async saveExpense(expense:any):Promise<any>{
+    console.log('saveExpense');
+    console.log(expense);
+    let id = expense.id;
+    let expenseWithOutId:any =_.omit(expense, ['id']);
+    let itemUpdated = await pnp.sp.web.lists.getByTitle('Depenses').items.getById(id).update(expenseWithOutId);
+    console.log('item updated');
+    console.log(itemUpdated);
   }
 
   private createObjectForDepensesDoc(res: any) {
-    console.log('expensesService - createObjectForDepensesDoc');
+    //console.log('expensesService - createObjectForDepensesDoc');
     res.forEach((item) => {
       let x: any = {};
       x.type = 'Document';
@@ -141,12 +151,13 @@ export class ExpensesService {
       if (item.TaxesCategory) {
         x.taxCategoryId = parseInt(item.TaxesCategory.Label);
       }
+      x.ServerRedirectedEmbedUri = item.ServerRedirectedEmbedUri
       this.expenses.push(x);
     });
   }
 
   private createObjectForDepensesItem(res: any) {
-    console.log('expensesService - createObjectForDepensesItem');
+    //console.log('expensesService - createObjectForDepensesItem');
     res.forEach(item => {
       let x: any = {};
       x.type = 'item';

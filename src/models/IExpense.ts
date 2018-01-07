@@ -21,4 +21,5 @@ export interface IExpense {
   relativeEditLink?: string;
   type?: string;
   p?:boolean;
+  ServerRedirectedEmbedUri:string;
 }

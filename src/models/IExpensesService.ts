@@ -5,9 +5,10 @@ import {Transaction} from "./ITransaction";
 import {Reimbursement} from "./IReimbursement";
 
 export interface IExpensesService{
-  getExpenses():Promise<IExpense[]>;
+  getExpenses(year?: number):Promise<IExpense[]>;
   getTaxCategories():TaxesCategory[];
   getRevenues(year?: number): Promise<Revenu[]>;
   getTransactionCompte(year?: number): Promise<Transaction[]>;
   getReimbursement(): Promise<Reimbursement[]>;
+  saveExpense(expense:IExpense):Promise<any>;
 }

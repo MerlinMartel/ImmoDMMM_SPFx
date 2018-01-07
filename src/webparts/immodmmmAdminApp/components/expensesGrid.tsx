@@ -1,15 +1,21 @@
 import * as React from 'react';
-import {DetailsList, MarqueeSelection, Spinner, SpinnerSize} from "office-ui-fabric-react";
+import {DetailsList, MarqueeSelection, Panel, PanelType, Spinner, SpinnerSize} from "office-ui-fabric-react";
 import {autobind} from "office-ui-fabric-react/lib/Utilities";
 import {IExpense} from "../../../models/IExpense";
 import * as _ from 'lodash';
 import {IColumn, Selection} from "office-ui-fabric-react/lib/DetailsList";
 import * as strings from "ImmodmmmAdminAppWebPartStrings";
 import {IImmodmmmAdminAppProps} from "./IImmodmmmAdminAppProps";
+import EditExpense from "./editExpense";
+import {IExpensesService} from "../../../../lib/models/IExpensesService";
+
+
 
 export interface IExpenseGridProps {
   expensesFiltered:IExpense[];
   isLoading:boolean;
+  parentToggle?:any;
+  expensesService:IExpensesService;
 }
 
 export interface IExpenseGridState {
@@ -18,6 +24,8 @@ export interface IExpenseGridState {
   isModalSelection?: boolean;
   isCompactMode?: boolean;
   expensesSorted?:IExpense[];
+  editPanelShow?:boolean;
+  editPanelItem?:IExpense;
 }
 let _columns: IColumn[] = [
   {
@@ -92,12 +100,25 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
     });
     this.state = {
       columns: _columns,
-      expensesSorted: this.props.expensesFiltered
+      expensesSorted: this.props.expensesFiltered,
+      editPanelShow: false
     };
+  }
+
+  public doParentToggle(){
+    console.log("doParentToggle");
   }
 
   public render(): React.ReactElement<IExpenseGridProps> {
     console.log('..ExpensesGrid - render');
+    let myCallback = (dataFromChild) => {
+      console.log(dataFromChild);
+      this.setState({
+        editPanelShow : false
+        });
+    };
+
+
     let renderGrid: JSX.Element = null;
     let renderSpinner: JSX.Element = null;
 
@@ -111,6 +132,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
         isHeaderVisible={ true }
         selection={ this._selection }
         selectionPreservedOnEmptyClick={ true }
+        onItemInvoked={ this._onItemInvoked }
       />;
     }
     if(this.props.isLoading){
@@ -125,8 +147,16 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
         { renderSpinner }
         { renderGrid }
         </MarqueeSelection>
+
+        <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService}/>
       </div>
     );
+  }
+  @autobind
+  private _onItemInvoked(expense:IExpense){
+    console.log('onItemInvoked');
+    console.log(expense);
+    this.setState({ editPanelShow: true, editPanelItem:expense });
   }
 
   @autobind

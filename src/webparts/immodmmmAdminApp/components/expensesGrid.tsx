@@ -8,6 +8,7 @@ import * as strings from "ImmodmmmAdminAppWebPartStrings";
 import {IImmodmmmAdminAppProps} from "./IImmodmmmAdminAppProps";
 import EditExpense from "./editExpense";
 import {IExpensesService} from "../../../../lib/models/IExpensesService";
+import { IWebPartContext } from "@microsoft/sp-webpart-base/lib";
 
 
 
@@ -16,6 +17,7 @@ export interface IExpenseGridProps {
   isLoading:boolean;
   parentToggle?:any;
   expensesService:IExpensesService;
+  context: IWebPartContext;
 }
 
 export interface IExpenseGridState {
@@ -148,7 +150,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
         { renderGrid }
         </MarqueeSelection>
 
-        <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService}/>
+        <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService} onPanelDismiss={() => this.setState({editPanelShow:false})} context = {this.props.context}/>
       </div>
     );
   }

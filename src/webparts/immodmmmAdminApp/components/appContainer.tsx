@@ -9,9 +9,11 @@ import Taxes from "./taxes";
 import {IExpensesService} from "../../../models/IExpensesService";
 import {IImmodmmmAdminAppProps} from "./IImmodmmmAdminAppProps";
 import * as strings from "ImmodmmmAdminAppWebPartStrings";
+import { IWebPartContext } from "@microsoft/sp-webpart-base/lib";
 
 export interface IAppContainerProps {
   expensesService:IExpensesService;
+  context: IWebPartContext;
 }
 
 export interface IAppContainerState {
@@ -115,7 +117,7 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
         <Pivot linkFormat={ PivotLinkFormat.tabs }>
           <PivotItem linkText='Dépenses'>
             <br/>
-            <ExpensesGrid expensesFiltered={ this.state.expensesFiltered } isLoading={this.state.isLoading} expensesService = {this.props.expensesService}/>
+            <ExpensesGrid expensesFiltered={ this.state.expensesFiltered } isLoading={this.state.isLoading} expensesService = {this.props.expensesService} context={this.props.context}/>
           </PivotItem>
           <PivotItem linkText='Impot'>
             <br/>

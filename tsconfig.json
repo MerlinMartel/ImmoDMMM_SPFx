@@ -8,6 +8,7 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "types": [
+      "sharepoint",
       "es6-promise",
       "es6-collections",
       "webpack-env"

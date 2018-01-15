@@ -1,17 +1,13 @@
 export interface IExpense {
-  id: number;
-  title?: string;
-  FileLeafRef?: string;
-  price?: number;
-  validated?: boolean;
-  manager?: string; // TODO trouver un meilleur nom
-  date?: Date;  // TODO pas un string...
+  id: string;
+  title: string;
+  fileName?: string;
+  price: number;
+  validated: boolean;
+  manager: string; // TODO trouver un meilleur nom
+  date: Date;  // TODO pas un string...
   dateValue?:number;
   dateFormatted?:string;
-  year?: number;
-  authorId?: number;
-  created: string;
-  modified: string;
   providerId?: number;
   provider?: string;
   flatId?: number;
@@ -21,5 +17,5 @@ export interface IExpense {
   relativeEditLink?: string;
   type?: string;
   p?:boolean;
-  ServerRedirectedEmbedUri:string;
+  previewUrl:string;
 }

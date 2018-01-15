@@ -15,6 +15,7 @@ import {ExpensesService} from "../../services/ExpensesService";
 import * as moment from 'moment';
 import {ExpensesServiceMock} from "../../services/ExpensesServiceMock";
 import { SPComponentLoader } from '@microsoft/sp-loader';
+import { IWebPartContext } from "@microsoft/sp-webpart-base/lib";
 
 export interface IImmodmmmAdminAppWebPartProps {
   description: string;
@@ -55,6 +56,7 @@ export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmo
       ImmodmmmAdminApp,
       {
         expensesService: this.expensesService,
+        context: this.context,
       }
     );
 

@@ -23,6 +23,7 @@
     "@types/react-addons-update": "0.14.14",
     "@types/react-dom": "0.14.18",
     "@types/webpack-env": ">=1.12.1 <1.14.0",
+    "@umaknow/uma-fabric": "^1.8.2",
     "lodash": "4.17.4",
     "moment": "2.19.1",
     "office-ui-fabric-react": "5.38.0",

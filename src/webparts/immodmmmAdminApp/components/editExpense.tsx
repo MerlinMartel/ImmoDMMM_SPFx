@@ -1,23 +1,35 @@
 import * as React from 'react';
 import {IExpense} from "../../../models/IExpense";
-import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Panel} from 'office-ui-fabric-react/lib/Panel';
-import {TextField} from 'office-ui-fabric-react/lib/TextField';
 import {autobind} from "office-ui-fabric-react/lib/Utilities";
 import {IExpensesService} from "../../../models/IExpensesService";
 import * as _ from 'lodash';
 import TaxonomyPicker from "react-taxonomypicker";
-import "react-taxonomypicker/dist/React.TaxonomyPicker.css";
 import {PanelType} from "office-ui-fabric-react/lib/components/Panel/Panel.types";
-import DatePicker2 from "./inputComponents/datePicker";
-import Iframe from 'react-iframe'
+import Iframe from 'react-iframe';
+import TextFieldControl from "@umaknow/uma-fabric/lib/controls/TextFieldControl/TextFieldControl";
+import IListItemProperty from "@umaknow/uma-fabric/lib/models/IListItemProperty";
+import DatePickerControl from "@umaknow/uma-fabric/lib/controls/DatePickerControl/DatePickerControl";
+import TaxonomyPickerControl from "@umaknow/uma-fabric/lib/controls/TaxonomyPickerControl/TaxonomyPickerControl";
+import { IWebPartContext } from "@microsoft/sp-webpart-base/lib";
+import ITaxonomyDataProvider from "@umaknow/uma-fabric/lib/dataProviders/ITaxonomyDataProvider";
+import TaxonomyDataProvider from "@umaknow/uma-fabric/lib/dataProviders/TaxonomyProvider";
 
 // TODO : quand on ferme le panel, la valeur n<est pas envoyé au parent, ce qui est un problème...
+
+// TODO : aller voir desjardins de rabih... dans on oninit, il devrait avoir des d/pendance  SPCOmponentloader.
+
+// TODO : faire le select de champ autpmatique. voicir baseSearchService.tx.      et schema.ts    variable schema et reverseschema  (voir news service aussi)
+
 export interface IEditExpenseProps {
   expense: IExpense;  // AKA, initial value
   showPanel: boolean;
   parentToggle?: any;
   expensesService: IExpensesService;
+
+  onPanelDismiss();
+  context: IWebPartContext;
 }
 
 export interface IEditExpenseState {
@@ -31,6 +43,9 @@ export interface IEditExpenseState {
   manager?: string;
   date?: Date;
   price?: number;
+  textFieldTestShouldReset?: boolean;
+  textFieldTestDisable?: boolean;
+
   //cat impot
   //cat document
   // logement
@@ -43,16 +58,23 @@ export interface IEditExpenseState {
 
 export default class EditExpense extends React.Component<IEditExpenseProps, IEditExpenseState> {
   //showPanel:boolean;
-
+  private fieldPropertyTitle?: IListItemProperty;
+  private fieldPropertyFileName?: IListItemProperty;
+  private fieldPropertyDate?: IListItemProperty;
+  private fieldPropertyPrice?: IListItemProperty;
+  private fieldPropertyTaxCategory?: IListItemProperty;
+  private taxonomyDataProvider: ITaxonomyDataProvider;
 
   constructor(props: IEditExpenseProps) {
     console.log('...EditExpense - Constructor');
     super(props);
 
+    this.taxonomyDataProvider = new TaxonomyDataProvider(this.props.context, 1033);
     this.state = {
       showPanelState: false,
+      textFieldTestShouldReset: false,
+      textFieldTestDisable:false
     };
-    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   public componentWillReceiveProps() {
@@ -64,12 +86,10 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
 
   @autobind
   private _cancel(): void {
-    console.log(this.state.testtitle);
-    //this.props.parentToggle.bind(this);
-    //this.setState({
-    //  showPanelState: false
-    //});
+    this.props.onPanelDismiss();
+
   }
+
 
   private renameObjectKey(obj, key, newKey) {
     if (_.includes(_.keys(obj), key)) {
@@ -82,7 +102,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
   @autobind
   private async _save(): Promise<any> {
     console.log(this.state.expenseState);
-    let expenseToSave: any = _.omit(this.state.expenseState, ['dateFormatted', 'dateValue', 'modified', 'relativeEditLink', 'type', 'created', 'year']);
+    let expenseToSave: any = _.omit(this.state.expenseState, ['dateFormatted', 'dateValue', 'modified', 'relativeEditLink', 'type', 'created', 'year','previewUrl',]);
     expenseToSave = this.renameObjectKey(expenseToSave, 'price', 'Prix');
     expenseToSave = this.renameObjectKey(expenseToSave, 'validated', 'Valide');
     expenseToSave = this.renameObjectKey(expenseToSave, 'date', 'Date1');
@@ -90,10 +110,15 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     expenseToSave = this.renameObjectKey(expenseToSave, 'providerId', 'FournisseursId');
     expenseToSave = this.renameObjectKey(expenseToSave, 'title', 'Title');
     expenseToSave = this.renameObjectKey(expenseToSave, 'manager', 'GestionnairesChoice');
+    expenseToSave = this.renameObjectKey(expenseToSave, 'flatId', 'Logements');
+    expenseToSave = this.renameObjectKey(expenseToSave, 'taxCategoryId', 'TaxesCategory');
     expenseToSave = this.renameObjectKey(expenseToSave, 'p', 'P');
+    expenseToSave = this.renameObjectKey(expenseToSave, 'fileName', 'FileLeafRef');
 
+    // TODO : Temporairement, trouver comment faire un save d<un champ taxo.
+    let expenseToSave2: any = _.omit(expenseToSave, ['FournisseursId', 'TaxesCategory','Logements']);
 
-    await this.props.expensesService.saveExpense(expenseToSave);
+    await this.props.expensesService.saveExpense(expenseToSave2);
     console.log('saved done');
     this.props.parentToggle.bind(this);
     this.setState({
@@ -102,102 +127,178 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
   }
 
   public componentDidMount() {
-    console.log('...editExpense - componentDidMount');
+    console.log('...editExpense -componentDidMount');
 
   }
 
-
-  private handleInputChange(event) {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-
+  @autobind
+  private handleFieldChange(fieldInfo:IListItemProperty) {
+    // Works with date, text, number
+    let temp = this.state.expenseState;
+    temp[fieldInfo.FieldInfo.InternalName] = fieldInfo.Value;
     this.setState({
-      [name]: value
+      expenseState: temp
     });
   }
 
+/*
+  private _onFieldUpdated(updatedProperty: IListItemProperty, fieldHasErrors: boolean) {
 
-  @autobind
-  private onBlur(event) {
-    console.log('onBlur');
-    //console.log(event);
-  }
+    //let fieldErrors = this.state.fieldErrors;
 
-  @autobind
-  private onFocus(event) {
-    console.log('onFocus');
-    //console.log(event);
-  }
+    // Update errors count
+    //fieldErrors[updatedProperty.InternalName] = fieldHasErrors;
 
-  @autobind
-  private onInput(event) {
-    console.log('onInput');
-    console.log(event);
+    // Every time a child sends a notification, we update the container main state with the current values
+    let updatedProperties: IListItemProperty[] = this.state.updatedPageProperties;
+
+    const initialProperty = find(this.state.initialPageProperties, (elt) => { return elt.InternalName === updatedProperty.InternalName; });
+    let initialPropertyValue = initialProperty.Value;
+    let udpatedPropertyValue = updatedProperty.Value;
+
+    if (updatedProperty.FieldInfo.Type === "DateTime") {
+      // Convert the date value as date to be able to compare them easily (instead of strings)
+      initialPropertyValue = new Date(initialPropertyValue);
+      udpatedPropertyValue = new Date(udpatedPropertyValue);
+    }
+
+    // If the value is the same as the original, we remove the property from the updated properties list
+    if (isEqual(initialPropertyValue, udpatedPropertyValue)) {
+
+      // Remove the property from the updatedPageProperties list
+      updatedProperties = updatedProperties.filter((elt) => { return elt.InternalName !== updatedProperty.InternalName; });
+
+    } else {
+      // Else, we replace the existing value by the new one
+      const existingIdx = findIndex(updatedProperties, { InternalName: updatedProperty.InternalName });
+      existingIdx !== -1 ? updatedProperties.splice(existingIdx, 1, updatedProperty) : updatedProperties.push(updatedProperty);
+    }
+
+    this.setState({
+      updatedPageProperties: updatedProperties,
+      fieldErrors: fieldErrors,
+    });
   }
+*/
 
   public render(): React.ReactElement<IEditExpenseProps> {
     console.log('...editExpense - render');
     let editPanel: JSX.Element = null;
     //let showPanel = this.props.showPanel;
 
-
     if (this.state.expenseState) {
-      editPanel =
+      this.fieldPropertyTitle = {
+        Value : this.state.expenseState.title,
+        FieldInfo : {
+          InternalName: "title",
+          Title: "Titre",
+          Type : "Text",
+          Required: false
+        }
+      };
+      this.fieldPropertyFileName = {
+        Value : this.state.expenseState.fileName,
+        FieldInfo : {
+          InternalName: "fileName",
+          Title: "Nom du fichier",
+          Type : "Text",
+          Required: true
+        }
+      };
+      this.fieldPropertyDate = {
+        Value : this.state.expenseState.dateValue,
+        FieldInfo : {
+          InternalName: "date",
+          Title: "Date",
+          Type : "DateTime",
+          Required: false
+        }
+      };
+      this.fieldPropertyPrice = {
+        Value : this.state.expenseState.price,
+        FieldInfo : {
+          InternalName: "price",
+          Title: "Prix",
+          Type : "Currency",
+          Required: false
+        }
+      };
+      this.fieldPropertyTaxCategory = {
+        Value : this.state.expenseState.taxCategoryId,
+        FieldInfo : {
+          InternalName: "taxCategoryId",
+          Title: "Catégorie de taxe",
+          Type : "Number",
+          Required: false
+        }
+      };
 
-        <div className="ms-Grid">
+      /*<TaxonomyPicker
+  name="flat"
+  displayName="Logement(s)"
+  termSetGuid="d6bcd487-69d8-4ec7-9c00-3d1b1219cae8"
+  termSetName="1821 Bennett - Logements"
+  termSetCountMaxSwapToAsync={100}
+  defaultValue={this.props.expense.flat}
+  multi={false}
+/>
+<TaxonomyPicker
+  name="catTaxes"
+  displayName="Catégories d'impôts"
+  termSetGuid="8bdcb6ba-48e1-4493-88ee-50e7abc5701a"
+  termSetName="Catégories d'impôts"
+  termSetCountMaxSwapToAsync={100}
+  multi={false}
+/>
+<TaxonomyPicker
+  name="catDoc"
+  displayName="Catégories Documents"
+  termSetGuid="761aa6ef-99fc-41be-8a3d-811683e6b925"
+  termSetName="Catégories Documents"
+  termSetCountMaxSwapToAsync={100}
+  multi={false}
+/>
+*/
+
+      editPanel =
+      <div className="ms-Grid">
           <div className="ms-Grid-row">
             <div className="ms-Grid-col ms-sm6">
-              <TextField
-                label='Nom du fichier'
-                type="text"
-                name="name"
-                onChange={this.handleInputChange}
-                value={this.state.name}
-                defaultValue={this.props.expense.FileLeafRef}
+              <TextFieldControl
+                disabled={false}
+                pageField={this.fieldPropertyTitle}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}
               />
-              <TextField
-                label='Titre'
-                type="text"
-                name="title"
-                onChange={this.handleInputChange}
-                value={this.state.title}
-                defaultValue={this.props.expense.title}
+              <TextFieldControl
+                disabled={false}
+                pageField={this.fieldPropertyFileName}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}
               />
-              <br/>
-              <TaxonomyPicker
-                name="flat"
-                displayName="Logement(s)"
-                termSetGuid="d6bcd487-69d8-4ec7-9c00-3d1b1219cae8"
-                termSetName="1821 Bennett - Logements"
-                termSetCountMaxSwapToAsync={100}
-                defaultValue={this.props.expense.flat}
-                multi={false}
+              <TextFieldControl
+                disabled={false}
+                pageField={this.fieldPropertyPrice}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}
               />
-              <TaxonomyPicker
-                name="catTaxes"
-                displayName="Catégories d'impôts"
-                termSetGuid="8bdcb6ba-48e1-4493-88ee-50e7abc5701a"
-                termSetName="Catégories d'impôts"
-                termSetCountMaxSwapToAsync={100}
-                multi={false}
+              <DatePickerControl
+                disabled={false}
+                pageField={this.fieldPropertyDate}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}
               />
-              <TaxonomyPicker
-                name="catDoc"
-                displayName="Catégories Documents"
-                termSetGuid="761aa6ef-99fc-41be-8a3d-811683e6b925"
-                termSetName="Catégories Documents"
-                termSetCountMaxSwapToAsync={100}
-                multi={false}
-              />
-              <br/>
-              <span>Date de la dépense</span>
-              <DatePicker2/>
-              <br/>
-              <input name="testtitle" type="text" value={this.state.testtitle} onChange={this.handleInputChange}/>
+              <TaxonomyPickerControl
+                taxonomyDataProvider={this.taxonomyDataProvider}
+                disabled={false}
+                context={this.props.context}
+                pageField={this.fieldPropertyTaxCategory}
+                isMulti={false}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}/>
             </div>
             <div className="ms-Grid-col ms-sm6">
-              <Iframe url={this.state.expenseState.ServerRedirectedEmbedUri}
+              <Iframe url={this.state.expenseState.previewUrl}
                       width="100%"
                       height="700px"
                       id="myId"
@@ -222,9 +323,6 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
           headerText='Large Panel'
         >
 
-          <span>Content goes here.   bloa bla bla</span><br/>
-          <span>title : {this.state.title}</span><br/>
-          <span>test title : {this.state.testtitle}</span><br/>
 
           {editPanel}
 

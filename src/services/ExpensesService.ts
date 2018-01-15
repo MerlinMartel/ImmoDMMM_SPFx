@@ -9,6 +9,10 @@ import {TaxesCategory} from "../models/ITaxesCategory";
 import {Revenu} from "../models/IRevenu";
 import {Transaction} from "../models/ITransaction";
 import {Reimbursement} from "../models/IReimbursement";
+import expenseDocFields from "../models/IExpenseDocFields";
+import {escape} from "@microsoft/sp-lodash-subset";
+import {extractBool, extractValue} from './SearchResultUtils';
+import {autobind} from "office-ui-fabric-react/lib/Utilities";
 
 export class ExpensesService {
   //implements IExpensesService
@@ -20,12 +24,33 @@ export class ExpensesService {
   private revenues: Revenu[] = [];
   private transactions: Transaction[] = [];
   private reimbursements: Reimbursement[] = [];
-
-
+  public expense:any; //TODO to fix
+  /*
+  private ReverseNews: { [spField: string]: string } = Object.keys(this.expense).reduce((acc, key) => {
+    acc[this.expense[key]] = key;
+    return acc;
+  }, {});
+  */
   public constructor(spfxContext: IWebPartContext) {
 
     this.siteCollUrl = `${spfxContext.pageContext.site.absoluteUrl}/`;
     this.webUrl = `${spfxContext.pageContext.web.absoluteUrl}/`;
+
+    this.expense = {
+      title: expenseDocFields.title,
+      price: expenseDocFields.price,
+      validated:expenseDocFields.validated,
+      date: expenseDocFields.date,
+      providerId: expenseDocFields.providerId,
+      manager: expenseDocFields.manager,
+      p: expenseDocFields.p,
+      flatId: expenseDocFields.flatId,
+      taxCategoryId:expenseDocFields.taxCategoryId,
+      previewUrl:expenseDocFields.previewUrl,
+      fileName:expenseDocFields.fileName,
+      id:expenseDocFields.id
+    };
+
     pnp.setup({
       spfxContext: spfxContext
     });
@@ -47,15 +72,15 @@ export class ExpensesService {
         dateFilterStringForSpecificYearDoc = "Date1 eq null and ContentTypeId ne '0x012000532D570857F0FA419A99D34691A46D25'";
         dateFilterStringForSpecificYearItem = "Date eq null and ContentTypeId ne '0x012000532D570857F0FA419A99D34691A46D25'";
       }
-      pnp.sp.web.lists.getByTitle('Depenses').items.filter(dateFilterStringForSpecificYearDoc).top(5000).select('FileLeafRef','Title','AuthorId','Date1','FournisseursId','GUID','GestionnairesChoice','GestionnairesId','Id','Logements','Notes1','P','Prix','RCol','ServerRedirectedEmbedUri','TaxesCategory','Valide').inBatch(batch).get().then(async (res: any) => {
-        this.createObjectForDepensesDoc(res);
+      pnp.sp.web.lists.getByTitle('Depenses').items.filter(dateFilterStringForSpecificYearDoc).top(5000).select('FileLeafRef','Title','AuthorId','Date1','FournisseursId','GUID','GestionnairesChoice','GestionnairesId','Id','Logements','Notes1','P','Prix','RCol','ServerRedirectedEmbedUri','TaxesCategory','Valide').inBatch(batch).get().then(async (res:any) => {
+        this.expenses = res.map(this._mapExpense);
       });
       pnp.sp.web.lists.getByTitle('D%C3%A9penses').items.filter(dateFilterStringForSpecificYearItem).top(5000).inBatch(batch).get().then(async (res: any) => {
         this.createObjectForDepensesItem(res);
       });
     } else {
       pnp.sp.web.lists.getByTitle('Depenses').items.top(5000).inBatch(batch).get().then(async (res: any) => {
-        this.createObjectForDepensesDoc(res);
+        this.expenses = res.map(this._mapExpense);
       });
       _.each(this.expenses,);
       pnp.sp.web.lists.getByTitle('D%C3%A9penses').items.top(5000).inBatch(batch).get().then(async (res: any) => {
@@ -108,7 +133,7 @@ export class ExpensesService {
         expenseItem.provider = providerItemFiltered[0].title;
       }
     });
-
+    console.log(this.expenses);
     return this.expenses;
   }
   public async saveExpense(expense:any):Promise<any>{
@@ -119,6 +144,42 @@ export class ExpensesService {
     let itemUpdated = await pnp.sp.web.lists.getByTitle('Depenses').items.getById(id).update(expenseWithOutId);
     console.log('item updated');
     console.log(itemUpdated);
+  }
+
+  @autobind
+  private _mapExpense(result): IExpense {
+    //TODO je n'aime pas cette fonction, car le type est basé sur la valeur par défaut... ce qui ajoute une valeur par défaut au propriété vide.
+    if(result && this.expense){
+      let expense: any = {  // TODO remettre le IExpense
+        title: extractValue(result, this.expense.title, "") ,
+        price: extractValue(result, this.expense.price, 0) ,
+        validated: extractValue(result, this.expense.validated, false),
+        //date: extractValue(result, this.expense.date, ""),
+        providerId: extractValue(result, this.expense.providerId, 0),
+        manager: extractValue(result, this.expense.manager, ""),
+        p: extractValue(result, this.expense.p, false),
+        flatId: extractValue(result, this.expense.flatId, 0),
+        taxCategoryId:extractValue(result, this.expense.taxCategoryId, 0),
+        previewUrl:extractValue(result, this.expense.previewUrl, ""),
+        fileName:extractValue(result, this.expense.fileName, ""),
+        id:extractValue(result, this.expense.id, ""),
+        dateValue:this.setDateValue(result, this.expense.date),
+        dateFormatted:this.setDateFormatted(result, this.expense.date)
+      };
+      return expense;
+    }else{
+      return null;
+    }
+  }
+  private setDateValue(expense, keyInput){
+    if (expense[keyInput] != null) {
+      return new Date(expense[keyInput]);
+    }
+  }
+  private setDateFormatted(expense, keyInput){
+    if (expense[keyInput] != null) {
+      return moment(expense[keyInput]).format('YYYY-MM-DD');
+    }
   }
 
   private createObjectForDepensesDoc(res: any) {

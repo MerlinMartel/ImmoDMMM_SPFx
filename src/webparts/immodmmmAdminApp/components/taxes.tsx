@@ -209,11 +209,8 @@ export default class Taxes extends React.Component<ITaxesProps, ITaxesState> {
 
 
 
-    let renderTable: JSX.Element[] = [];
-    let renderItem: JSX.Element = null;
-
-    _.each(this.taxeCategories, (tc) => {
-      renderItem = <div className="ms-Grid-row">
+    let renderTable: JSX.Element[] = this.taxeCategories.map((tc)=> {
+      return <div className="ms-Grid-row">
         <div className="ms-Grid-col ms-sm2">{tc.title}</div>
         <div className="ms-Grid-col ms-sm2 taxCategory">{tc.number}</div>
         <div className="ms-Grid-col ms-sm2">{tc.sum.toFixed(2)}</div>
@@ -222,9 +219,7 @@ export default class Taxes extends React.Component<ITaxesProps, ITaxesState> {
         <div className="ms-Grid-col ms-sm2">{tc.percentagePersonalMM.toFixed(2)}</div>
         <div className="ms-Grid-col ms-sm2">{tc.sumPersonalMM.toFixed(2)}</div>
       </div>;
-      renderTable.push(renderItem);
     });
-
 
     return (
 

@@ -31,7 +31,7 @@ export default class ImmodmmmAdminApp extends React.Component<IImmodmmmAdminAppP
     //console.log('.ImmodmmmAdminApp - render');
     return (
       <div>
-        <AppContainer expensesService={this.props.expensesService}/>
+        <AppContainer expensesService={this.props.expensesService} context={this.props.context}/>
       </div>
     );
   }

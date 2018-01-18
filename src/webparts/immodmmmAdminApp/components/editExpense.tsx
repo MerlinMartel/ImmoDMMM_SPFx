@@ -15,6 +15,8 @@ import TaxonomyPickerControl from "@umaknow/uma-fabric/lib/controls/TaxonomyPick
 import { IWebPartContext } from "@microsoft/sp-webpart-base/lib";
 import ITaxonomyDataProvider from "@umaknow/uma-fabric/lib/dataProviders/ITaxonomyDataProvider";
 import TaxonomyDataProvider from "@umaknow/uma-fabric/lib/dataProviders/TaxonomyProvider";
+import ListItemDataProvider from "@umaknow/uma-fabric/lib/dataProviders/ListItemDataProvider";
+import IListItemDataProvider from "@umaknow/uma-fabric/lib/dataProviders/IListItemDataProvider";
 
 // TODO : quand on ferme le panel, la valeur n<est pas envoyé au parent, ce qui est un problème...
 
@@ -27,6 +29,7 @@ export interface IEditExpenseProps {
   showPanel: boolean;
   parentToggle?: any;
   expensesService: IExpensesService;
+
 
   onPanelDismiss();
   context: IWebPartContext;
@@ -64,12 +67,21 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
   private fieldPropertyPrice?: IListItemProperty;
   private fieldPropertyTaxCategory?: IListItemProperty;
   private taxonomyDataProvider: ITaxonomyDataProvider;
+  private _listItemDataProvider:IListItemDataProvider;
 
   constructor(props: IEditExpenseProps) {
     console.log('...EditExpense - Constructor');
     super(props);
 
+    // TODO : faire ce call plus haut...
     this.taxonomyDataProvider = new TaxonomyDataProvider(this.props.context, 1033);
+    // asdfasdf
+    // asdfasdf
+    // asdfasdf
+    // asdfasdf
+    // asdfasdf
+
+    this._listItemDataProvider = new ListItemDataProvider(this.props.context, 1033);
     this.state = {
       showPanelState: false,
       textFieldTestShouldReset: false,
@@ -116,9 +128,13 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     expenseToSave = this.renameObjectKey(expenseToSave, 'fileName', 'FileLeafRef');
 
     // TODO : Temporairement, trouver comment faire un save d<un champ taxo.
-    let expenseToSave2: any = _.omit(expenseToSave, ['FournisseursId', 'TaxesCategory','Logements']);
+    let expenseToSave2: any = _.omit(expenseToSave, ['FournisseursId','Logements','provider']);
 
-    await this.props.expensesService.saveExpense(expenseToSave2);
+
+
+    // TODO : changer le nom du fichier ne fonctionne pas !! :-(
+    await this._listItemDataProvider.updateLisItemProperties(Number(this.state.expenseState.id),'39676029-b0e2-414a-8103-4e5f22544562',[this.fieldPropertyTaxCategory, this.fieldPropertyFileName]);
+    //await this.props.expensesService.saveExpense(expenseToSave2);
     console.log('saved done');
     this.props.parentToggle.bind(this);
     this.setState({
@@ -198,11 +214,12 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
       };
       this.fieldPropertyFileName = {
         Value : this.state.expenseState.fileName,
+        InternalName: "FileLeafRef",
         FieldInfo : {
           InternalName: "fileName",
           Title: "Nom du fichier",
           Type : "Text",
-          Required: true
+          Required: true,
         }
       };
       this.fieldPropertyDate = {
@@ -228,8 +245,10 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
         FieldInfo : {
           InternalName: "taxCategoryId",
           Title: "Catégorie de taxe",
-          Type : "Number",
-          Required: false
+          Type : "TaxonomyFieldType",
+          Required: false,
+          TermSetId: '8bdcb6ba-48e1-4493-88ee-50e7abc5701a',
+          TextField: '53897e1e-9f97-4368-9536-f411887d356c'
         }
       };
 
@@ -291,7 +310,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
               <TaxonomyPickerControl
                 taxonomyDataProvider={this.taxonomyDataProvider}
                 disabled={false}
-                context={this.props.context}
+                context={this.props.context as IWebPartContext}
                 pageField={this.fieldPropertyTaxCategory}
                 isMulti={false}
                 onFieldUpdated={this.handleFieldChange}

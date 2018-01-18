@@ -75,7 +75,7 @@ let _columns: IColumn[] = [
   {
     key: 'column4',
     name: 'Catégorie de taxe',
-    fieldName: 'taxCategory',
+    fieldName: 'taxCategory.Label',
     minWidth: 40,
     maxWidth: 100,
     isResizable: true,
@@ -150,7 +150,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
         { renderGrid }
         </MarqueeSelection>
 
-        <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService} onPanelDismiss={() => this.setState({editPanelShow:false})} context = {this.props.context}/>
+        <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService} onPanelDismiss={() => this.setState({editPanelShow:false})} context = {this.props.context  as IWebPartContext}/>
       </div>
     );
   }

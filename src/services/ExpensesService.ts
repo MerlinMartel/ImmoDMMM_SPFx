@@ -73,6 +73,7 @@ export class ExpensesService {
         dateFilterStringForSpecificYearItem = "Date eq null and ContentTypeId ne '0x012000532D570857F0FA419A99D34691A46D25'";
       }
       pnp.sp.web.lists.getByTitle('Depenses').items.filter(dateFilterStringForSpecificYearDoc).top(5000).select('FileLeafRef','Title','AuthorId','Date1','FournisseursId','GUID','GestionnairesChoice','GestionnairesId','Id','Logements','Notes1','P','Prix','RCol','ServerRedirectedEmbedUri','TaxesCategory','Valide').inBatch(batch).get().then(async (res:any) => {
+        console.log(res);
         this.expenses = res.map(this._mapExpense);
       });
       pnp.sp.web.lists.getByTitle('D%C3%A9penses').items.filter(dateFilterStringForSpecificYearItem).top(5000).inBatch(batch).get().then(async (res: any) => {

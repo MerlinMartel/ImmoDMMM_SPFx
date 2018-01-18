@@ -56,7 +56,7 @@ export default class ImmodmmmAdminAppWebPart extends BaseClientSideWebPart<IImmo
       ImmodmmmAdminApp,
       {
         expensesService: this.expensesService,
-        context: this.context,
+        context: this.context as IWebPartContext,
       }
     );
 

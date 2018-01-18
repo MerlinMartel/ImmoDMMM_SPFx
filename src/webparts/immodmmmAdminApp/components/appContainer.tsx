@@ -117,7 +117,7 @@ export default class AppContainer extends React.Component<IAppContainerProps, IA
         <Pivot linkFormat={ PivotLinkFormat.tabs }>
           <PivotItem linkText='Dépenses'>
             <br/>
-            <ExpensesGrid expensesFiltered={ this.state.expensesFiltered } isLoading={this.state.isLoading} expensesService = {this.props.expensesService} context={this.props.context}/>
+            <ExpensesGrid expensesFiltered={ this.state.expensesFiltered } isLoading={this.state.isLoading} expensesService = {this.props.expensesService} context={this.props.context as IWebPartContext}/>
           </PivotItem>
           <PivotItem linkText='Impot'>
             <br/>

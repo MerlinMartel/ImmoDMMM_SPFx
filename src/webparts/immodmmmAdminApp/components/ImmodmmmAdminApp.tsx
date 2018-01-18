@@ -10,6 +10,7 @@ import {
 } from 'office-ui-fabric-react/lib/DetailsList';
 import * as _ from 'lodash';
 import AppContainer from "./appContainer";
+import {IWebPartContext} from "@microsoft/sp-webpart-base/lib";
 
 
 export interface IImmodmmmAdminAppState {
@@ -31,7 +32,7 @@ export default class ImmodmmmAdminApp extends React.Component<IImmodmmmAdminAppP
     //console.log('.ImmodmmmAdminApp - render');
     return (
       <div>
-        <AppContainer expensesService={this.props.expensesService} context={this.props.context}/>
+        <AppContainer expensesService={this.props.expensesService} context={this.props.context as IWebPartContext}/>
       </div>
     );
   }

@@ -13,10 +13,12 @@
   },
   "externals": {
     "uma-fabric": "node_modules/@umaknow/uma-fabric/dist/uma-fabric.bundle.js"
+
   },
   "localizedResources": {
     "ImmodmmmAdminAppWebPartStrings": "lib/webparts/immodmmmAdminApp/loc/{locale}.js",
     "textFieldStrings": "node_modules/@umaknow/uma-fabric/lib/controls/TextFieldControl/loc/{locale}.js",
-    "datePickerStrings" : "node_modules/@umaknow/uma-fabric/lib/controls/DatePickerControl/loc/{locale}.js"
+    "datePickerStrings" : "node_modules/@umaknow/uma-fabric/lib/controls/DatePickerControl/loc/{locale}.js",
+    "taxonomyPickerStrings": "node_modules/@umaknow/uma-fabric/lib/controls/TaxonomyPickerControl/loc/{locale}.js"
   }
 }

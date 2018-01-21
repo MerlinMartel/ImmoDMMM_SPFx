@@ -79,7 +79,7 @@ export default class Taxes extends React.Component<ITaxesProps, ITaxesState> {
   private getSumFromTaxId(expenses: IExpense[], taxCategoryId: number) {
     return _(expenses)
       .filter((expense: IExpense) => {
-        return expense.taxCategoryId === taxCategoryId;
+        return expense.taxCategoryId.WssId === taxCategoryId;
       })
       .reduce((sum, expense: IExpense) => {
         return sum + expense.price;
@@ -89,7 +89,7 @@ export default class Taxes extends React.Component<ITaxesProps, ITaxesState> {
   private getPersonalSumFromTaxId(expenses: IExpense[], taxCategoryId: number, percentage) {
     let expensesInCategory = _(expenses)
       .filter((expense: IExpense) => {
-        return expense.taxCategoryId === taxCategoryId;
+        return expense.taxCategoryId.WssId === taxCategoryId;
       })
       .value();
     if (percentage !== 0) {
@@ -104,28 +104,28 @@ export default class Taxes extends React.Component<ITaxesProps, ITaxesState> {
          */
         let expense1e = _(expensesInCategory)
           .filter((expense: IExpense) => {
-            return expense.flatId === 15;
+            return expense.flatId.WssId === 15;
           })
           .reduce((sum, expense: IExpense) => {
             return sum + expense.price;
           }, 0);
         let expense2e = _(expensesInCategory)
           .filter((expense: IExpense) => {
-            return expense.flatId === 12;
+            return expense.flatId.WssId === 12;
           })
           .reduce((sum, expense: IExpense) => {
             return sum + expense.price;
           }, 0);
         let expense3e = _(expensesInCategory)
           .filter((expense: IExpense) => {
-            return expense.flatId === 13;
+            return expense.flatId.WssId === 13;
           })
           .reduce((sum, expense: IExpense) => {
             return sum + expense.price;
           }, 0);
         let expenseGlobal = _(expensesInCategory)
           .filter((expense: IExpense) => {
-            return expense.flatId === 14;
+            return expense.flatId.WssId === 14;
           })
           .reduce((sum, expense: IExpense) => {
             return sum + expense.price;

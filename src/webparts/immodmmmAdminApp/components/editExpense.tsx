@@ -17,6 +17,7 @@ import ITaxonomyDataProvider from "@umaknow/uma-fabric/lib/dataProviders/ITaxono
 import TaxonomyDataProvider from "@umaknow/uma-fabric/lib/dataProviders/TaxonomyProvider";
 import ListItemDataProvider from "@umaknow/uma-fabric/lib/dataProviders/ListItemDataProvider";
 import IListItemDataProvider from "@umaknow/uma-fabric/lib/dataProviders/IListItemDataProvider";
+import ToggleFieldControl from "@umaknow/uma-fabric/lib/controls/ToggleFieldControl/ToggleFieldControl";
 
 // TODO : quand on ferme le panel, la valeur n<est pas envoyé au parent, ce qui est un problème...
 
@@ -66,6 +67,11 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
   private fieldPropertyDate?: IListItemProperty;
   private fieldPropertyPrice?: IListItemProperty;
   private fieldPropertyTaxCategory?: IListItemProperty;
+  private fieldPropertyFlat?: IListItemProperty;
+  private fieldPropertyProvider?: IListItemProperty;
+  private fieldPropertyValidated?: IListItemProperty;
+  private fieldPropertyP?: IListItemProperty;
+  private allfields?: IListItemProperty[];
   private taxonomyDataProvider: ITaxonomyDataProvider;
   private _listItemDataProvider:IListItemDataProvider;
 
@@ -73,13 +79,10 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     console.log('...EditExpense - Constructor');
     super(props);
 
+    this.allfields = []; //this.fieldPropertyProvider
+
     // TODO : faire ce call plus haut...
     this.taxonomyDataProvider = new TaxonomyDataProvider(this.props.context, 1033);
-    // asdfasdf
-    // asdfasdf
-    // asdfasdf
-    // asdfasdf
-    // asdfasdf
 
     this._listItemDataProvider = new ListItemDataProvider(this.props.context, 1033);
     this.state = {
@@ -113,28 +116,10 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
 
   @autobind
   private async _save(): Promise<any> {
-    console.log(this.state.expenseState);
-    let expenseToSave: any = _.omit(this.state.expenseState, ['dateFormatted', 'dateValue', 'modified', 'relativeEditLink', 'type', 'created', 'year','previewUrl',]);
-    expenseToSave = this.renameObjectKey(expenseToSave, 'price', 'Prix');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'validated', 'Valide');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'date', 'Date1');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'authorId', 'AuthorId');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'providerId', 'FournisseursId');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'title', 'Title');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'manager', 'GestionnairesChoice');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'flatId', 'Logements');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'taxCategoryId', 'TaxesCategory');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'p', 'P');
-    expenseToSave = this.renameObjectKey(expenseToSave, 'fileName', 'FileLeafRef');
-
-    // TODO : Temporairement, trouver comment faire un save d<un champ taxo.
-    let expenseToSave2: any = _.omit(expenseToSave, ['FournisseursId','Logements','provider']);
-
-
 
     // TODO : changer le nom du fichier ne fonctionne pas !! :-(
-    await this._listItemDataProvider.updateLisItemProperties(Number(this.state.expenseState.id),'39676029-b0e2-414a-8103-4e5f22544562',[this.fieldPropertyTaxCategory, this.fieldPropertyFileName]);
-    //await this.props.expensesService.saveExpense(expenseToSave2);
+    await this._listItemDataProvider.updateLisItemProperties(Number(this.state.expenseState.id),'39676029-b0e2-414a-8103-4e5f22544562',this.allfields);
+    //await this.props.expensesService.saveExpense(expenseToSave);
     console.log('saved done');
     this.props.parentToggle.bind(this);
     this.setState({
@@ -143,7 +128,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
   }
 
   public componentDidMount() {
-    console.log('...editExpense -componentDidMount');
+    console.log('...editExpense - componentDidMount');
 
   }
 
@@ -205,6 +190,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     if (this.state.expenseState) {
       this.fieldPropertyTitle = {
         Value : this.state.expenseState.title,
+        InternalName: "Title",
         FieldInfo : {
           InternalName: "title",
           Title: "Titre",
@@ -224,6 +210,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
       };
       this.fieldPropertyDate = {
         Value : this.state.expenseState.dateValue,
+        InternalName: "Date1",
         FieldInfo : {
           InternalName: "date",
           Title: "Date",
@@ -233,6 +220,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
       };
       this.fieldPropertyPrice = {
         Value : this.state.expenseState.price,
+        InternalName: "Prix",
         FieldInfo : {
           InternalName: "price",
           Title: "Prix",
@@ -242,6 +230,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
       };
       this.fieldPropertyTaxCategory = {
         Value : this.state.expenseState.taxCategoryId,
+        InternalName : "TaxesCategory",
         FieldInfo : {
           InternalName: "taxCategoryId",
           Title: "Catégorie de taxe",
@@ -251,6 +240,51 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
           TextField: '53897e1e-9f97-4368-9536-f411887d356c'
         }
       };
+      this.fieldPropertyFlat = {
+        Value : this.state.expenseState.flatId,
+        InternalName: "Logements",
+        FieldInfo : {
+          InternalName: "flatId",
+          Title: "Logement",
+          Type : "TaxonomyFieldType",
+          Required: false,
+          TermSetId: 'd6bcd487-69d8-4ec7-9c00-3d1b1219cae8',
+          TextField: '2871ba5e-070d-49d7-b039-ea1ace4fa927'
+        }
+      };
+
+      this.fieldPropertyProvider = {
+        Value : this.state.expenseState.provider,
+        InternalName: "FournisseursId",
+        FieldInfo : {
+          InternalName: "provider",
+          Title: "Fournisseur",
+          Type : "Lookup",
+          Required: false
+        }
+      };
+      this.fieldPropertyValidated = {
+        Value : this.state.expenseState.validated,
+        InternalName: "Valide",
+        FieldInfo : {
+          InternalName: "validated",
+          Title: "Validé",
+          Type : "Boolean",
+          Required: false
+        }
+      };
+      this.fieldPropertyP = {
+        Value : this.state.expenseState.p,
+        InternalName : "P",
+        FieldInfo : {
+          InternalName: "p",
+          Title: "P",
+          Type : "Boolean",
+          Required: false
+        }
+      };
+
+      this.allfields = [this.fieldPropertyValidated,this.fieldPropertyDate,this.fieldPropertyFlat,this.fieldPropertyP,this.fieldPropertyPrice,this.fieldPropertyTaxCategory,this.fieldPropertyTitle];// this.fieldPropertyProvider
 
       /*<TaxonomyPicker
   name="flat"
@@ -290,7 +324,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
                 shouldReset={false}
               />
               <TextFieldControl
-                disabled={false}
+                disabled={true}
                 pageField={this.fieldPropertyFileName}
                 onFieldUpdated={this.handleFieldChange}
                 shouldReset={false}
@@ -315,6 +349,26 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
                 isMulti={false}
                 onFieldUpdated={this.handleFieldChange}
                 shouldReset={false}/>
+              <TaxonomyPickerControl
+                taxonomyDataProvider={this.taxonomyDataProvider}
+                disabled={false}
+                context={this.props.context as IWebPartContext}
+                pageField={this.fieldPropertyFlat}
+                isMulti={false}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}/>
+              <ToggleFieldControl
+                disabled={false}
+                pageField={this.fieldPropertyValidated}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}
+              />
+              <ToggleFieldControl
+                disabled={false}
+                pageField={this.fieldPropertyP}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}
+              />
             </div>
             <div className="ms-Grid-col ms-sm6">
               <Iframe url={this.state.expenseState.previewUrl}

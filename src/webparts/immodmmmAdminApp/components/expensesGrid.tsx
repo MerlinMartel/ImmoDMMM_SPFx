@@ -75,12 +75,56 @@ let _columns: IColumn[] = [
   {
     key: 'column4',
     name: 'Catégorie de taxe',
-    fieldName: 'taxCategory.Label',
+    fieldName: 'taxCategory',
     minWidth: 40,
     maxWidth: 100,
     isResizable: true,
     onColumnClick: this._onColumnClick,
     data:'string',
+    ariaLabel: 'Operations for name'
+  },
+  {
+    key: 'column5',
+    name: 'Gestionnaire',
+    fieldName: 'manager',
+    minWidth: 40,
+    maxWidth: 100,
+    isResizable: true,
+    onColumnClick: this._onColumnClick,
+    data: 'string',
+    ariaLabel: 'Operations for name'
+  },
+  {
+    key: 'column6',
+    name: 'Valide ?',
+    fieldName: 'validated',
+    minWidth: 40,
+    maxWidth: 100,
+    isResizable: true,
+    onColumnClick: this._onColumnClick,
+    data: 'boolean',
+    ariaLabel: 'Operations for name'
+  },
+  {
+    key: 'column7',
+    name: 'Fournisseur',
+    fieldName: 'providerId',
+    minWidth: 40,
+    maxWidth: 100,
+    isResizable: true,
+    onColumnClick: this._onColumnClick,
+    data: 'string',
+    ariaLabel: 'Operations for name'
+  },
+  {
+    key: 'column7',
+    name: 'Logement',
+    fieldName: 'flat',
+    minWidth: 40,
+    maxWidth: 100,
+    isResizable: true,
+    onColumnClick: this._onColumnClick,
+    data: 'string',
     ariaLabel: 'Operations for name'
   }
 ];

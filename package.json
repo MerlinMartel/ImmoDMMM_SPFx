@@ -9,7 +9,7 @@
     "build": "gulp bundle",
     "clean": "gulp clean",
     "test": "gulp test",
-    "dev": "set NODE_NO_HTTP2=1&& gulp serve"
+    "dev": "set NODE_NO_HTTP2=1&& gulp serve --nobrowser"
   },
   "dependencies": {
     "@microsoft/sp-core-library": "~1.3.4",

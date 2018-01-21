@@ -1,3 +1,5 @@
+import ITaxonomyTermValue from "@umaknow/uma-fabric/lib/models/ITaxonomyTermValue";
+
 export interface IExpense {
   id: string;
   title: string;
@@ -10,9 +12,9 @@ export interface IExpense {
   dateFormatted?:string;
   providerId?: number;
   provider?: string;
-  flatId?: number;
+  flatId?: ITaxonomyTermValue;
   flat?: string;
-  taxCategoryId?: number;
+  taxCategoryId?: ITaxonomyTermValue;
   taxCategory?: string;
   relativeEditLink?: string;
   type?: string;

@@ -112,7 +112,7 @@ export class ExpensesService {
 
     _.map(this.expenses, (expenseItem: IExpense) => {
       let taxoItemFiltered = _.filter(this.taxonomyHiddenListItems, (taxoItem) => {
-        return taxoItem.id == expenseItem.flatId;
+        return taxoItem.id == expenseItem.flatId.WssId;
       });
       if (taxoItemFiltered.length > 0) {
         expenseItem.flat = taxoItemFiltered[0].term1036;
@@ -120,7 +120,7 @@ export class ExpensesService {
     });
     _.map(this.expenses, (expenseItem: IExpense) => {
       let taxoItemFiltered = _.filter(this.taxonomyHiddenListItems, (taxoItem) => {
-        return taxoItem.id == expenseItem.taxCategoryId;
+        return taxoItem.id == expenseItem.taxCategoryId.WssId;
       });
       if (taxoItemFiltered.length > 0) {
         expenseItem.taxCategory = taxoItemFiltered[0].term1036;

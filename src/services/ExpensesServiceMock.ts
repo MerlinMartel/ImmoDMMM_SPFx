@@ -138,4 +138,10 @@ export class ExpensesServiceMock implements IExpensesService {
     var toto = [];
     return toto;
   }
+
+  public async getProviderItems():Promise<any> {
+    var toto = [];
+    return toto;
+  }
+
 }

@@ -103,12 +103,20 @@ let _columns: IColumn[] = [
     isResizable: true,
     onColumnClick: this._onColumnClick,
     data: 'boolean',
-    ariaLabel: 'Operations for name'
+    ariaLabel: 'Operations for name',
+    onRender: (item: IExpense) => {
+      if(item.validated){
+        return (
+          <i className="ms-Icon ms-Icon--SkypeCircleCheck" aria-hidden="true"></i>
+        );
+      }
+
+    },
   },
   {
     key: 'column7',
     name: 'Fournisseur',
-    fieldName: 'providerId',
+    fieldName: 'provider',
     minWidth: 40,
     maxWidth: 100,
     isResizable: true,
@@ -156,7 +164,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
   }
 
   public render(): React.ReactElement<IExpenseGridProps> {
-    console.log('..ExpensesGrid - render');
+    //console.log('..ExpensesGrid - render');
     let myCallback = (dataFromChild) => {
       console.log(dataFromChild);
       this.setState({
@@ -167,6 +175,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
 
     let renderGrid: JSX.Element = null;
     let renderSpinner: JSX.Element = null;
+    let editExpense: JSX.Element = null;
 
     if(this.props.isLoading == false && this.props.expensesFiltered.length === 0){
       renderGrid = <div>No Items to show</div>;
@@ -186,6 +195,12 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
     }else{
       renderSpinner = <div></div>;
     }
+    if (this.state.editPanelShow && this.state.editPanelItem){
+      editExpense = <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService} onPanelDismiss={() => this.setState({editPanelShow:false})} context = {this.props.context  as IWebPartContext}/>
+    }else{
+      editExpense = null;
+    }
+
 
     return (
       <div>
@@ -194,14 +209,14 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
         { renderGrid }
         </MarqueeSelection>
 
-        <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService} onPanelDismiss={() => this.setState({editPanelShow:false})} context = {this.props.context  as IWebPartContext}/>
+        {editExpense}
       </div>
     );
   }
   @autobind
   private _onItemInvoked(expense:IExpense){
-    console.log('onItemInvoked');
-    console.log(expense);
+    //console.log('onItemInvoked');
+
     this.setState({ editPanelShow: true, editPanelItem:expense });
   }
 

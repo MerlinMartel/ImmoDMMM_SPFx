@@ -1,4 +1,5 @@
 import ITaxonomyTermValue from "@umaknow/uma-fabric/lib/models/ITaxonomyTermValue";
+import ILookupValue from "@umaknow/uma-fabric/lib/models/ILookupValue";
 
 export interface IExpense {
   id: string;
@@ -11,7 +12,7 @@ export interface IExpense {
   dateValue?:number;
   dateFormatted?:string;
   providerId?: number;
-  provider?: string;
+  provider?: ILookupValue;
   flatId?: ITaxonomyTermValue;
   flat?: string;
   taxCategoryId?: ITaxonomyTermValue;

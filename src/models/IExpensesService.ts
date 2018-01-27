@@ -3,6 +3,7 @@ import {TaxesCategory} from "./ITaxesCategory";
 import {Revenu} from "./IRevenu";
 import {Transaction} from "./ITransaction";
 import {Reimbursement} from "./IReimbursement";
+import {IProvider} from "./IProvider";
 
 export interface IExpensesService{
   getExpenses(year?: number):Promise<IExpense[]>;
@@ -11,4 +12,5 @@ export interface IExpensesService{
   getTransactionCompte(year?: number): Promise<Transaction[]>;
   getReimbursement(): Promise<Reimbursement[]>;
   saveExpense(expense:IExpense):Promise<any>;
+  getProviderItems():Promise<IProvider[]>;
 }

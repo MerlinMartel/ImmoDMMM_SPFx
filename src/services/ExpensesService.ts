@@ -131,6 +131,7 @@ export class ExpensesService {
         return providerItem.id == expenseItem.providerId;
       });
       if (providerItemFiltered.length > 0) {
+        //TODO : valider que c<est ok d<enlever le .title
         expenseItem.provider = providerItemFiltered[0].title;
       }
     });
@@ -159,7 +160,7 @@ export class ExpensesService {
         providerId: extractValue(result, this.expense.providerId, 0),
         manager: extractValue(result, this.expense.manager, ""),
         p: extractValue(result, this.expense.p, false),
-        flatId: extractValue(result, this.expense.flatId, 0),
+        flatId: extractValue(result, this.expense.flatId, ""),
         taxCategoryId:extractValue(result, this.expense.taxCategoryId, 0),
         previewUrl:extractValue(result, this.expense.previewUrl, ""),
         fileName:extractValue(result, this.expense.fileName, ""),
@@ -252,6 +253,12 @@ export class ExpensesService {
       this.expenses.push(x);
 
     });
+  }
+
+  public async getProviderItems() :Promise<IProvider[]>{
+    let providers1 : any = [];
+    providers1 = await pnp.sp.site.rootWeb.lists.getByTitle('Fournisseurs').items.top(5000).usingCaching().get();
+    return providers1;
   }
 
   public async getTaxonomyHiddenList() {

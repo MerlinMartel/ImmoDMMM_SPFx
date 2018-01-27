@@ -5,7 +5,6 @@ import { Panel} from 'office-ui-fabric-react/lib/Panel';
 import {autobind} from "office-ui-fabric-react/lib/Utilities";
 import {IExpensesService} from "../../../models/IExpensesService";
 import * as _ from 'lodash';
-import TaxonomyPicker from "react-taxonomypicker";
 import {PanelType} from "office-ui-fabric-react/lib/components/Panel/Panel.types";
 import Iframe from 'react-iframe';
 import TextFieldControl from "@umaknow/uma-fabric/lib/controls/TextFieldControl/TextFieldControl";
@@ -18,8 +17,10 @@ import TaxonomyDataProvider from "@umaknow/uma-fabric/lib/dataProviders/Taxonomy
 import ListItemDataProvider from "@umaknow/uma-fabric/lib/dataProviders/ListItemDataProvider";
 import IListItemDataProvider from "@umaknow/uma-fabric/lib/dataProviders/IListItemDataProvider";
 import ToggleFieldControl from "@umaknow/uma-fabric/lib/controls/ToggleFieldControl/ToggleFieldControl";
+import DropDownControl from "@umaknow/uma-fabric/lib/controls/DropDownControl/DropDownControl";
+import {ISelectableOption} from "office-ui-fabric-react/lib-amd/utilities/selectableOption";
+import {IProvider} from "../../../models/IProvider";
 
-// TODO : quand on ferme le panel, la valeur n<est pas envoyé au parent, ce qui est un problème...
 
 // TODO : aller voir desjardins de rabih... dans on oninit, il devrait avoir des d/pendance  SPCOmponentloader.
 
@@ -40,20 +41,21 @@ export interface IEditExpenseState {
   showPanelState: boolean;
   expenseState?: IExpense; // AKA, current value in the form
   testtitle?: string;
+  providersDropDownOptions?:any;
 
+  /*
   title?: string;
   name?: string;
-  provider?: string;
+  provider?: any;
   manager?: string;
   date?: Date;
   price?: number;
-  textFieldTestShouldReset?: boolean;
-  textFieldTestDisable?: boolean;
 
+*/
   //cat impot
   //cat document
   // logement
-  p?: boolean;
+  //p?: boolean;
   //note
   // r
   // valide
@@ -76,7 +78,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
   private _listItemDataProvider:IListItemDataProvider;
 
   constructor(props: IEditExpenseProps) {
-    console.log('...EditExpense - Constructor');
+    //console.log('...EditExpense - Constructor');
     super(props);
 
     this.allfields = []; //this.fieldPropertyProvider
@@ -86,17 +88,14 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
 
     this._listItemDataProvider = new ListItemDataProvider(this.props.context, 1033);
     this.state = {
-      showPanelState: false,
-      textFieldTestShouldReset: false,
-      textFieldTestDisable:false
+      showPanelState: this.props.showPanel,
+      expenseState: this.props.expense
     };
   }
 
-  public componentWillReceiveProps() {
-    this.setState({
-      showPanelState: this.props.showPanel,
-      expenseState: this.props.expense
-    });
+  public componentDidMount() {
+    //console.log('...EditExpense - componentDidMount');
+    this.getProviders(this.props);
   }
 
   @autobind
@@ -121,15 +120,24 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     await this._listItemDataProvider.updateLisItemProperties(Number(this.state.expenseState.id),'39676029-b0e2-414a-8103-4e5f22544562',this.allfields);
     //await this.props.expensesService.saveExpense(expenseToSave);
     console.log('saved done');
-    this.props.parentToggle.bind(this);
-    this.setState({
-      showPanelState: false
-    });
+    this.props.onPanelDismiss();  //TODO : ok de faire comme ceci ?
   }
 
-  public componentDidMount() {
-    console.log('...editExpense - componentDidMount');
 
+
+  @autobind
+  private async getProviders(props: IEditExpenseProps){
+    let providersForDropDown:ISelectableOption[] = [];
+    let providersRaw:any = await props.expensesService.getProviderItems();
+    providersRaw.map((p:any) => {
+      let providerItem:ISelectableOption = {"key": p.Id, "text": p.Title};
+      providersForDropDown.push(providerItem);
+    });
+    let sortedprovidersForDropDown = _.sortBy(providersForDropDown, (p:ISelectableOption) => {return p.text});
+    console.log(sortedprovidersForDropDown);
+    this.setState({
+      providersDropDownOptions: sortedprovidersForDropDown
+    });
   }
 
   @autobind
@@ -140,6 +148,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     this.setState({
       expenseState: temp
     });
+
   }
 
 /*
@@ -183,11 +192,19 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
 */
 
   public render(): React.ReactElement<IEditExpenseProps> {
-    console.log('...editExpense - render');
+    console.log('...editExpense -  render');
     let editPanel: JSX.Element = null;
     //let showPanel = this.props.showPanel;
+    let options:ISelectableOption[] =
+      [{ key: 'AA', text: 'Option aa' },{ key: 'AB', text: 'Option ab' }];
 
-    if (this.state.expenseState) {
+
+
+
+
+
+
+    if (this.state.expenseState && this.state.providersDropDownOptions) {
       this.fieldPropertyTitle = {
         Value : this.state.expenseState.title,
         InternalName: "Title",
@@ -260,7 +277,8 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
           InternalName: "provider",
           Title: "Fournisseur",
           Type : "Lookup",
-          Required: false
+          Required: false,
+          DropDownOptions: this.state.providersDropDownOptions
         }
       };
       this.fieldPropertyValidated = {
@@ -280,11 +298,10 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
           InternalName: "p",
           Title: "P",
           Type : "Boolean",
-          Required: false
+          Required: false,
         }
       };
-
-      this.allfields = [this.fieldPropertyValidated,this.fieldPropertyDate,this.fieldPropertyFlat,this.fieldPropertyP,this.fieldPropertyPrice,this.fieldPropertyTaxCategory,this.fieldPropertyTitle];// this.fieldPropertyProvider
+      this.allfields = [this.fieldPropertyValidated,this.fieldPropertyDate,this.fieldPropertyFlat,this.fieldPropertyP,this.fieldPropertyPrice,this.fieldPropertyTaxCategory,this.fieldPropertyTitle,this.fieldPropertyProvider];
 
       /*<TaxonomyPicker
   name="flat"
@@ -357,6 +374,12 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
                 isMulti={false}
                 onFieldUpdated={this.handleFieldChange}
                 shouldReset={false}/>
+              <DropDownControl
+                disabled={false}
+                pageField={this.fieldPropertyProvider}
+                onFieldUpdated={this.handleFieldChange}
+                shouldReset={false}
+              />
               <ToggleFieldControl
                 disabled={false}
                 pageField={this.fieldPropertyValidated}
@@ -369,6 +392,8 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
                 onFieldUpdated={this.handleFieldChange}
                 shouldReset={false}
               />
+
+
             </div>
             <div className="ms-Grid-col ms-sm6">
               <Iframe url={this.state.expenseState.previewUrl}
@@ -389,9 +414,9 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     return (
       <div>
         <Panel
-          isOpen={this.state.showPanelState}
+          isOpen={this.props.showPanel}
           // tslint:disable-next-line:jsx-no-lambda
-          onDismiss={() => this.setState({showPanelState: false})}
+          onDismiss={() => this.props.onPanelDismiss()}
           type={PanelType.large}
           headerText='Large Panel'
         >

@@ -10,8 +10,6 @@ import EditExpense from "./editExpense";
 import {IExpensesService} from "../../../../lib/models/IExpensesService";
 import { IWebPartContext } from "@microsoft/sp-webpart-base/lib";
 
-
-
 export interface IExpenseGridProps {
   expensesFiltered:IExpense[];
   isLoading:boolean;
@@ -141,14 +139,13 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
   private _selection: Selection;
 
   constructor(props: IExpenseGridProps) {
-    console.log('..ExpensesGrid - Constructor - start');
+    //console.log('..ExpensesGrid - Constructor - start');
     super(props);
 
     this._selection = new Selection({
       onSelectionChanged: () => {
         this.setState({
           selectionDetails: this._getSelectionDetails(),
-          //isModalSelection: this._selection.isModal()
         });
       }
     });
@@ -159,10 +156,6 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
     };
   }
 
-  public doParentToggle(){
-    console.log("doParentToggle");
-  }
-
   public render(): React.ReactElement<IExpenseGridProps> {
     //console.log('..ExpensesGrid - render');
     let myCallback = (dataFromChild) => {
@@ -171,7 +164,6 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
         editPanelShow : false
         });
     };
-
 
     let renderGrid: JSX.Element = null;
     let renderSpinner: JSX.Element = null;
@@ -196,7 +188,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
       renderSpinner = <div></div>;
     }
     if (this.state.editPanelShow && this.state.editPanelItem){
-      editExpense = <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} parentToggle={this.doParentToggle} expensesService = {this.props.expensesService} onPanelDismiss={() => this.setState({editPanelShow:false})} context = {this.props.context  as IWebPartContext}/>
+      editExpense = <EditExpense showPanel={this.state.editPanelShow} expense={this.state.editPanelItem} expensesService = {this.props.expensesService} onPanelDismiss={() => this.setState({editPanelShow:false})} context = {this.props.context  as IWebPartContext}/>
     }else{
       editExpense = null;
     }
@@ -213,6 +205,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
       </div>
     );
   }
+
   @autobind
   private _onItemInvoked(expense:IExpense){
     //console.log('onItemInvoked');
@@ -222,6 +215,7 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
 
   @autobind
   private _onColumnClick(ev: React.MouseEvent<HTMLElement>, column: IColumn) {
+    console.log("..ExpensesGrid - _onColumnClick");
     const { columns, expensesSorted } = this.state;
     let newItems: IExpense[] = expensesSorted.slice();
     let newColumns: IColumn[] = columns.slice();
@@ -243,8 +237,10 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
       expensesSorted: newItems
     });
   }
+
   @autobind
   private _sortItems(items: IExpense[], sortBy: string, descending = false): IExpense[] {
+    console.log("..ExpensesGrid - _sortItems");
     if (descending) {
       return items.sort((a: IExpense, b: IExpense) => {
         if (a[sortBy] < b[sortBy]) {

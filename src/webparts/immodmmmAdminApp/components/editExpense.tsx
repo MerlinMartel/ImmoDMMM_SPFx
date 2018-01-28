@@ -5,7 +5,6 @@ import {Panel} from 'office-ui-fabric-react/lib/Panel';
 import {autobind} from "office-ui-fabric-react/lib/Utilities";
 import {IExpensesService} from "../../../models/IExpensesService";
 import * as _ from 'lodash';
-import {PanelType} from "office-ui-fabric-react/lib/components/Panel/Panel.types";
 import Iframe from 'react-iframe';
 import TextFieldControl from "@umaknow/uma-fabric/lib/controls/TextFieldControl/TextFieldControl";
 import IListItemProperty from "@umaknow/uma-fabric/lib/models/IListItemProperty";
@@ -20,6 +19,7 @@ import ToggleFieldControl from "@umaknow/uma-fabric/lib/controls/ToggleFieldCont
 import DropDownControl from "@umaknow/uma-fabric/lib/controls/DropDownControl/DropDownControl";
 import {ISelectableOption} from "office-ui-fabric-react/lib-amd/utilities/selectableOption";
 import {IProvider} from "../../../models/IProvider";
+import {PanelType} from 'office-ui-fabric-react';
 
 
 // TODO : aller voir desjardins de rabih... dans on oninit, il devrait avoir des d/pendance  SPCOmponentloader.
@@ -77,7 +77,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
 
   private renameObjectKey(obj, key, newKey) {
     if (_.includes(_.keys(obj), key)) {
-      obj[newKey] = _.clone(obj[key], true);
+      obj[newKey] = _.clone(obj[key]);  // enlever le 2e parametre qui était true suite à update
       delete obj[key];
     }
     return obj;

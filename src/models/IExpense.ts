@@ -13,6 +13,7 @@ export interface IExpense {
   dateFormatted?:string;
   providerId?: number;
   provider?: ILookupValue;
+  providerLabel?: string;
   flatId?: ITaxonomyTermValue;
   flat?: string;
   taxCategoryId?: ITaxonomyTermValue;

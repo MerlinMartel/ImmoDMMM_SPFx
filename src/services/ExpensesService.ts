@@ -132,7 +132,7 @@ export class ExpensesService {
       });
       if (providerItemFiltered.length > 0) {
         //TODO : valider que c<est ok d<enlever le .title
-        expenseItem.provider = providerItemFiltered[0].title;
+        expenseItem.providerLabel = providerItemFiltered[0].title;
       }
     });
     console.log(this.expenses);
@@ -265,7 +265,7 @@ export class ExpensesService {
     //TODO : valider si c<est necessaire
     var taxonomyHiddenList: [TaxonomyHiddenListItem];
     await pnp.sp.site.rootWeb.lists.getByTitle('TaxonomyHiddenList').items.top(5000).get().then((res: any) => {
-      _.each(res, item => {
+      _.each(res, (item:any) => {
         let x = new TaxonomyHiddenListItem;
         x.id = item.Id;
         x.path1033 = item.Path1033;
@@ -348,7 +348,7 @@ export class ExpensesService {
         taxeCategory: 42
       }
     ];
-    _.each(taxCatRaw, item => {
+    _.each(taxCatRaw, (item:any) => {
       let x = new TaxesCategory;
       x.title = item.title;
       x.number = item.number;
@@ -363,7 +363,7 @@ export class ExpensesService {
 
     this.revenues = [];
     await pnp.sp.web.lists.getByTitle('Revenue (Loyer et autres)').items.filter(dateFilterString).top(5000).get().then((res: any) => {
-      _.each(res, item => {
+      _.each(res, (item:any) => {
         let x = new Revenu;
         x.id = item.Id;
         x.r1821 = item.revPremier;
@@ -380,7 +380,7 @@ export class ExpensesService {
     let dateFilterString = "Date gt '" + year + "-01-01T00:00:00Z' and Date lt '" + year + "-12-31T00:00:00Z'";
     this.transactions = [];
     await pnp.sp.web.lists.getByTitle('Transactions Compte Banque').items.filter(dateFilterString).top(5000).get().then((res: any) => {
-      _.each(res, item => {
+      _.each(res, (item:any) => {
         let x = new Transaction;
         x.id = item.Id;
         x.folio = item.CompteNumero;
@@ -402,7 +402,7 @@ export class ExpensesService {
   public async getReimbursement(): Promise<Reimbursement[]> {
     this.reimbursements = [];
     await pnp.sp.web.lists.getByTitle('Remboursement').items.top(5000).get().then((res: any) => {
-      _.each(res, item => {
+      _.each(res, (item:any) => {
         let x = new Reimbursement();
         x.id = item.Id;
         x.title = item.Title;

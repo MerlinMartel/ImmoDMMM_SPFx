@@ -114,7 +114,7 @@ let _columns: IColumn[] = [
   {
     key: 'column7',
     name: 'Fournisseur',
-    fieldName: 'provider',
+    fieldName: 'providerLabel',
     minWidth: 40,
     maxWidth: 100,
     isResizable: true,

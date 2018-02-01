@@ -1,14 +1,23 @@
 import * as React from 'react';
-import {DetailsList, MarqueeSelection, Panel, PanelType, Spinner, SpinnerSize} from "office-ui-fabric-react";
+import {MarqueeSelection, Spinner, SpinnerSize} from "office-ui-fabric-react";
 import {autobind} from "office-ui-fabric-react/lib/Utilities";
 import {IExpense} from "../../../models/IExpense";
-import * as _ from 'lodash';
-import {IColumn, Selection} from "office-ui-fabric-react/lib/DetailsList";
-import * as strings from "ImmodmmmAdminAppWebPartStrings";
-import {IImmodmmmAdminAppProps} from "./IImmodmmmAdminAppProps";
+import {
+  CheckboxVisibility,
+  ColumnActionsMode,
+  ConstrainMode,
+  DetailsList,
+  DetailsListLayoutMode as LayoutMode,
+  IColumn,
+  IGroup,
+  Selection,
+  SelectionMode,
+  buildColumns
+} from 'office-ui-fabric-react/lib/DetailsList';
 import EditExpense from "./editExpense";
 import {IExpensesService} from "../../../../lib/models/IExpensesService";
 import { IWebPartContext } from "@microsoft/sp-webpart-base/lib";
+import * as _ from "lodash"
 
 export interface IExpenseGridProps {
   expensesFiltered:IExpense[];
@@ -58,7 +67,7 @@ let _columns: IColumn[] = [
     maxWidth: 100,
     isResizable: true,
     isSorted: true,
-    isSortedDescending: false,
+    isSortedDescending: true,
     onRender: (item: IExpense) => {
       return (
         <span>
@@ -155,6 +164,13 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
       editPanelShow: false
     };
   }
+  public componentWillReceiveProps(nextProps){
+    this.state = {
+      columns: _columns,
+      expensesSorted: nextProps.expensesFiltered,
+      editPanelShow: false
+    };
+  }
 
   public render(): React.ReactElement<IExpenseGridProps> {
     //console.log('..ExpensesGrid - render');
@@ -169,17 +185,18 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
     let renderSpinner: JSX.Element = null;
     let editExpense: JSX.Element = null;
 
-    if(this.props.isLoading == false && this.props.expensesFiltered.length === 0){
+    if(this.props.isLoading == false && this.state.expensesSorted.length === 0){
       renderGrid = <div>No Items to show</div>;
     }
-    if(this.props.isLoading == false && this.props.expensesFiltered.length > 0){
+    if(this.props.isLoading == false && this.state.expensesSorted.length > 0){
       renderGrid = <DetailsList
-        items={ this.props.expensesFiltered }
+        items={ this.state.expensesSorted }
         columns={ _columns }
         isHeaderVisible={ true }
         selection={ this._selection }
         selectionPreservedOnEmptyClick={ true }
         onItemInvoked={ this._onItemInvoked }
+        onColumnHeaderClick={this._onColumnHeaderClick.bind(this)}
       />;
     }
     if(this.props.isLoading){
@@ -214,8 +231,8 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
   }
 
   @autobind
-  private _onColumnClick(ev: React.MouseEvent<HTMLElement>, column: IColumn) {
-    console.log("..ExpensesGrid - _onColumnClick");
+  private _onColumnHeaderClick(ev: React.MouseEvent<HTMLElement>, column: IColumn) {
+    //console.log("..ExpensesGrid - _onColumnClick");
     const { columns, expensesSorted } = this.state;
     let newItems: IExpense[] = expensesSorted.slice();
     let newColumns: IColumn[] = columns.slice();
@@ -240,28 +257,9 @@ export default class ExpensesGrid extends React.Component<IExpenseGridProps, IEx
 
   @autobind
   private _sortItems(items: IExpense[], sortBy: string, descending = false): IExpense[] {
-    console.log("..ExpensesGrid - _sortItems");
-    if (descending) {
-      return items.sort((a: IExpense, b: IExpense) => {
-        if (a[sortBy] < b[sortBy]) {
-          return 1;
-        }
-        if (a[sortBy] > b[sortBy]) {
-          return -1;
-        }
-        return 0;
-      });
-    } else {
-      return items.sort((a: IExpense, b: IExpense) => {
-        if (a[sortBy] < b[sortBy]) {
-          return -1;
-        }
-        if (a[sortBy] > b[sortBy]) {
-          return 1;
-        }
-        return 0;
-      });
-    }
+    let sortString:string;
+    descending ? sortString = "desc" : sortString = "asc";
+    return _.orderBy(items, (x)=> {return x[sortBy]}, sortString)
   }
 
   private _getSelectionDetails(): string {

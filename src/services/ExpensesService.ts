@@ -15,7 +15,7 @@ import {extractBool, extractValue} from './SearchResultUtils';
 import {autobind} from "office-ui-fabric-react/lib/Utilities";
 
 export class ExpensesService {
-  //implements IExpensesService
+  //implements   IExpensesService
   private expenses: any;
   private providers: IProvider[];
   private taxonomyHiddenListItems: TaxonomyHiddenListItem[];
@@ -26,7 +26,7 @@ export class ExpensesService {
   private reimbursements: Reimbursement[] = [];
   public expense:any; //TODO to fix
   /*
-  private ReverseNews: { [spField: string]: string } = Object.keys(this.expense).reduce((acc, key) => {
+  private ReverseNews: {[spField: string]: string } = Object.keys(this.expense).reduce((acc, key) => {
     acc[this.expense[key]] = key;
     return acc;
   }, {});

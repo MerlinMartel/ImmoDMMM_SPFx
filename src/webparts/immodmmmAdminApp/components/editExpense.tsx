@@ -89,7 +89,7 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
     // TODO : changer le nom du fichier ne fonctionne pas !! :-(
     await this._listItemDataProvider.updateLisItemProperties(Number(this.state.expenseState.id), '39676029-b0e2-414a-8103-4e5f22544562', this.allfields);
     //await this.props.expensesService.saveExpense(expenseToSave);
-    console.log('saved done');
+    console.log('saved don e');
     this.props.onPanelDismiss();  //TODO : ok de faire comme ceci ?
   }
 
@@ -197,10 +197,10 @@ export default class EditExpense extends React.Component<IEditExpenseProps, IEdi
         }
       };
       this.fieldPropertyProvider = {
-        Value: this.state.expenseState.provider,
+        Value: this.state.expenseState.providerId,
         InternalName: "FournisseursId",
         FieldInfo: {
-          InternalName: "provider",
+          InternalName: "providerId",
           Title: "Fournisseur",
           Type: "Lookup",
           Required: false,
